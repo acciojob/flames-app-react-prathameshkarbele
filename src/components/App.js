@@ -1,107 +1,88 @@
-import React, { Component, useState } from "react";
-import "../styles/App.css";
+import React, {Component, useState} from "react";
+import '../styles/App.css';
 
-class App extends Component {
-  render() {
-    function print() {
-      const input1 = document.getElementById("input1");
-      const input2 = document.getElementById("input2");
+class App extends Component{
+  state = {
+    data : {name1:'',
+      name2:'',
+      answer:''}
+  }
 
-      console.log(input1.value);
-      console.log(input2.value);
-      let str1 = "";
-      let str2 = "";
-      for (let i = 0; i < input1.value.length; i++) {
-        for (let j = 0; j < input2.value.length; j++) {
-          if (input1.value.charAt(i) === input2.value.charAt(j)) {
-            str1 =
-              input1.value.substring(0, i) +
-              input1.value.substring(i + 1, input1.value.length);
-            str2 =
-              input2.value.substring(0, j) +
-              input2.value.substring(j + 1, input2.value.length);
-            break;
+  handleChange = (e) => {
+        const data = {...this.state.data}
+        data[e.currentTarget.name] = e.currentTarget.value;
+        this.setState({data})
+  }
+
+  match = (s1,s2) => {
+      let count = 0
+      let dict = {}
+      for (let i=0;i<s1.length;i++){
+          if(s1[i] in dict){
+              dict[s1[i]]+=1
+          }else{
+              dict[s1[i]] = 1
           }
+      }
+      for (let j=0;j<s2.length;j++){
+          if(s2[j] in dict){
+              dict[s2[j]]-=1
+              count+=1
+          }
+          if(dict[s2[j]]==0){
+              delete dict[s2[j]]
+          }
+      }
+      return count
+  }
+
+  handleClick = e => {
+    if(e.currentTarget.name == 'clear'){
+          const data = {
+              name1:'',
+              name2:'',
+              answer:''
+          }
+          this.setState({data})
+          return
+    }else if(this.state.data.name1.length && this.state.data.name2.length){
+        let count = this.state.data.name1.length+this.state.data.name2.length-(this.match(this.state.data.name1,this.state.data.name2)*2)
+        let answer;
+        if(count%6==1){
+            answer = "Friends"
+        }else if(count%6==2){
+            answer = "Love"
+        }else if(count%6==3){
+            answer = "Affection"
+        }else if(count%6==4){
+            answer = "Marriage"
+        }else if(count%6==5){
+            answer = "Enemy"
+        }else{
+            answer = "Siblings"
         }
-      }
-      console.log((str1.length + str2.length) % 6);
-      relationship((str1.length + str2.length) % 6);
+        const data = {...this.state.data}
+        data.answer = answer
+        this.setState({data})
+    }else{
+        const data = {...this.state.data}
+        data.answer = 'Please Enter valid input'
+        this.setState({data})
     }
+  }
 
-    function relationship(str) {
-      const answer = document.getElementById("answer");
-      let ans = "";
-      if (str % 6 == 0) {
-        ans = "Siblings";
-        console.log("Siblings");
-      } else if (str % 6 == 1) {
-        ans = "Friends";
-        console.log("Friends");
-      } else if (str % 6 == 2) {
-        ans = "Love";
-        console.log("Love");
-      } else if (str % 6 == 3) {
-        ans = "Affection";
-        console.log("Affection");
-      } else if (str % 6 == 4) {
-        ans = "Marriage";
-        console.log("Marriage");
-      } else {
-        ans = "Enemy";
-        console.log("Enemy");
-      }
-      answer.innerHTML = ans;
-    }
-
-    function clear() {
-      const input1 = document.getElementById("input1");
-      const input2 = document.getElementById("input2");
-      const answer = document.getElementById("answer");
-
-      input1.value = "";
-      input2.value = "";
-      answer.innerHTML = "";
-    }
-
-    return (
-      <div id="main">
-        {/* Do not remove the main div */}
-        <input
-          type="text"
-          data-testid="input1"
-          id="input1"
-          placeholder="First Name"
-        />
-        <br></br>
-        <br></br>
-        <input
-          type="text"
-          data-testid="input2"
-          id="input2"
-          placeholder="Second Name"
-        />
-        <br></br>
-        <br></br>
-        <button
-          onClick={print}
-          id="calculate_relationship"
-          data-testid="calculate_relationship"
-        >
-          Calculate Relationship Future
-        </button>
-        <br></br>
-        <br></br>
-        <h3 data-testid="answer" id="answer">
-          Output
-        </h3>
-        <br></br>
-        <br></br>
-        <button onClick={clear} data-testid="clear">
-          Clear inputs and relationship status
-        </button>
-      </div>
-    );
+  render(){
+    return(
+        <div>
+          <input data-testid="input1" value={this.state.data.name1} onChange={this.handleChange} type="text" name="name1" placeholder={'Enter first name'}/>
+          <input data-testid="input2" value={this.state.data.name2} onChange={this.handleChange} type="text" name="name2" placeholder={'Enter second name'}/>
+          <button data-testid="calculate_relationship" onClick={this.handleClick} name="calculate_relationship">Calculate Relationship Future</button>
+          <button data-testid="clear" onClick={this.handleClick} name="clear">Clear</button>
+          <h3 data-testid="answer">{this.state.data.answer}</h3>
+        </div>
+    )
   }
 }
+
 
 export default App;
